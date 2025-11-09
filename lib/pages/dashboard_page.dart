@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -18,7 +18,7 @@ class DashboardPage extends StatelessWidget {
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
             onPressed: () {
-              authProvider.logout();
+              ref.read(authProvider.notifier).logout();
             },
           ),
         ],
@@ -36,7 +36,7 @@ class DashboardPage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                'Welcome, ${authProvider.username}!',
+                'Welcome, ${authState.username}!',
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
@@ -55,14 +55,14 @@ class DashboardPage extends StatelessWidget {
                       ListTile(
                         leading: const Icon(Icons.person),
                         title: const Text('Username'),
-                        subtitle: Text(authProvider.username ?? 'N/A'),
+                        subtitle: Text(authState.username ?? 'N/A'),
                       ),
                       const Divider(),
                       ListTile(
                         leading: const Icon(Icons.verified_user),
                         title: const Text('Status'),
                         subtitle: Text(
-                          authProvider.isAuthenticated
+                          authState.isAuthenticated
                               ? 'Authenticated'
                               : 'Not Authenticated',
                         ),
@@ -74,7 +74,7 @@ class DashboardPage extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton.icon(
                 onPressed: () {
-                  authProvider.logout();
+                  ref.read(authProvider.notifier).logout();
                 },
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),

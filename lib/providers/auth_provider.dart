@@ -1,11 +1,29 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AuthProvider extends ChangeNotifier {
-  bool _isAuthenticated = false;
-  String? _username;
+// Auth State class
+class AuthState {
+  final bool isAuthenticated;
+  final String? username;
 
-  bool get isAuthenticated => _isAuthenticated;
-  String? get username => _username;
+  const AuthState({
+    this.isAuthenticated = false,
+    this.username,
+  });
+
+  AuthState copyWith({
+    bool? isAuthenticated,
+    String? username,
+  }) {
+    return AuthState(
+      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      username: username ?? this.username,
+    );
+  }
+}
+
+// Auth Notifier
+class AuthNotifier extends StateNotifier<AuthState> {
+  AuthNotifier() : super(const AuthState());
 
   Future<bool> login(String username, String password) async {
     // Simulate API call delay
@@ -13,9 +31,10 @@ class AuthProvider extends ChangeNotifier {
 
     // Simple validation - in a real app, this would call an API
     if (username.isNotEmpty && password.isNotEmpty) {
-      _isAuthenticated = true;
-      _username = username;
-      notifyListeners();
+      state = AuthState(
+        isAuthenticated: true,
+        username: username,
+      );
       return true;
     }
 
@@ -23,8 +42,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void logout() {
-    _isAuthenticated = false;
-    _username = null;
-    notifyListeners();
+    state = const AuthState(
+      isAuthenticated: false,
+      username: null,
+    );
   }
 }
+
+// Auth Provider
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier();
+});
