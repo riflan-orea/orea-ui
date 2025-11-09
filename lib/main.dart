@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'providers/auth_provider.dart';
-import 'pages/login_page.dart';
-import 'pages/dashboard_page.dart';
+import 'router/app_router.dart';
 
 void main() {
   runApp(
@@ -17,17 +15,15 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
+    final router = ref.watch(routerProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Orea UI',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: authState.isAuthenticated
-          ? const DashboardPage()
-          : const LoginPage(),
+      routerConfig: router,
     );
   }
 }
