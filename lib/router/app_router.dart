@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 import '../pages/login_page.dart';
 import '../pages/dashboard_page.dart';
+import '../pages/reactive_form_page.dart';
+import '../pages/users_page.dart';
+import '../widgets/app_layout.dart';
 
 // Router provider
 final routerProvider = Provider<GoRouter>((ref) {
@@ -36,15 +39,43 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        name: 'dashboard',
-        builder: (context, state) => const DashboardPage(),
-      ),
+      // Login route (no layout)
       GoRoute(
         path: '/login',
         name: 'login',
         builder: (context, state) => const LoginPage(),
+      ),
+      // Protected routes with layout (using ShellRoute)
+      ShellRoute(
+        builder: (context, state, child) {
+          return AppLayout(
+            title: _getPageTitle(state.matchedLocation),
+            child: child,
+          );
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            name: 'dashboard',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: DashboardPage(),
+            ),
+          ),
+          GoRoute(
+            path: '/reactive-form',
+            name: 'reactive-form',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ReactiveFormPage(),
+            ),
+          ),
+          GoRoute(
+            path: '/users',
+            name: 'users',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: UsersPage(),
+            ),
+          ),
+        ],
       ),
     ],
   );
@@ -64,4 +95,22 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 
   final Ref ref;
+}
+
+// Helper function to get page title based on route
+String _getPageTitle(String location) {
+  switch (location) {
+    case '/':
+      return 'Dashboard';
+    case '/reactive-form':
+      return 'Reactive Form Demo';
+    case '/users':
+      return 'Users Management';
+    case '/settings':
+      return 'Settings';
+    case '/help':
+      return 'Help';
+    default:
+      return 'Orea UI';
+  }
 }
